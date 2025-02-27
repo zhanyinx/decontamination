@@ -33,19 +33,6 @@ def extract_csv(csv_file) {
 }
 
 
-//  process index{
-//      cpus 5
-//      memory '20 GB'
-//      docker "docker://repbioinfo/xenome.2017.01:xenome-1.0.0"
-//      tag "index"
-//      output:
-//      path("idx*")
-//      script:
-//      """
-//      xenome index -T ${task.cpus} -P idx -H ${params.mousefasta} -G ${params.humanfasta}
-//      """
-//  }
-
 process decontamination{
     publishDir "${params.outdir}/${sample_id}", mode: 'copy'
     container "docker://repbioinfo/xenome.2017.01:xenome-1.0.0"
@@ -54,10 +41,10 @@ process decontamination{
     input:
     tuple val(sample_id), path(fastq_1), path(fastq_2), val(lane)
     output:
-    path("${sample_id}_${lane}_human.fastq")
+    path("${sample_id}_l${lane}_human*")
     script:
     """
-    xenome classify -T ${task.cpus} -P ${params.index} --pairs --host-name ${sample_id}_mouse --graft-name ${sample_id}_${lane}_human -i ${fastq_1} -i ${fastq_2}
+    xenome classify -T ${task.cpus} -P ${params.index} --pairs --host-name ${sample_id}_mouse --graft-name ${sample_id}_l${lane}_human -i ${fastq_1} -i ${fastq_2}
     """
 }
 
