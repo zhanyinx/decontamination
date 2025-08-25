@@ -35,16 +35,18 @@ def extract_csv(csv_file) {
 
 process decontamination{
     publishDir "${params.outdir}/${sample_id}", mode: 'copy'
-    container "docker://repbioinfo/xenome.2017.01:xenome-1.0.0"
+    // container "docker://yinxiu/xenome:latest"
+    container "docker://yinxiu/xengsort:latest"
     cpus 8
     memory '20 GB'
     input:
     tuple val(sample_id), path(fastq_1), path(fastq_2), val(lane)
     output:
-    path("${sample_id}_l${lane}_human*")
+    path("${sample_id}_l${lane}_human*graft*")
     script:
     """
     xenome classify -T ${task.cpus} -P ${params.index} --pairs --host-name ${sample_id}_mouse --graft-name ${sample_id}_l${lane}_human -i ${fastq_1} -i ${fastq_2}
+    # xengsort classify --index /hpcnfs/scratch/DIMA/zhan/xengsort_index/idx --fastq ${fastq_1} --pairs ${fastq_2} --prefix ${sample_id}_l${lane}_human --mode count -T 8
     """
 }
 
